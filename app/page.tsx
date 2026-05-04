@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-12 text-slate-900 sm:px-10 lg:px-16">
@@ -14,12 +16,12 @@ export default function Home() {
             структурированные описания объектов, ключевые преимущества,
             инвестиционные блоки, условия покупки и презентационные тексты.
           </p>
-          <button
-            type="button"
+          <Link
+            href="/new"
             className="mt-8 inline-flex items-center justify-center rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
           >
             Создать описание объекта
-          </button>
+          </Link>
         </section>
 
         <section className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 sm:p-10">
