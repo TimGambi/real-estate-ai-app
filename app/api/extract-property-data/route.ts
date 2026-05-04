@@ -2,6 +2,7 @@ interface ExtractPropertyDataRequest {
   title?: string;
   sourceUrl?: string;
   rawText?: string;
+  hasPdfFile?: boolean;
   targetAudience?: string;
   tone?: string;
 }
@@ -10,16 +11,25 @@ export async function POST(request: Request) {
   const body = (await request.json()) as ExtractPropertyDataRequest;
 
   const title = body.title?.trim() ?? "";
+  const sourceUrl = body.sourceUrl?.trim() ?? "";
   const rawText = body.rawText?.trim() ?? "";
+  const hasPdfFile = Boolean(body.hasPdfFile);
 
-  if (!title && !rawText) {
+  if (!title && !sourceUrl && !rawText && !hasPdfFile) {
     return Response.json(
       {
-        error: "Добавьте название объекта или описание материалов для анализа.",
+        error: "Добавьте хотя бы один источник: название проекта, ссылку, описание или PDF-файл.",
       },
       { status: 400 },
     );
   }
+
+  const sourceSummaryParts = [
+    title ? "Использовано название проекта" : null,
+    sourceUrl ? "Использована ссылка на объект" : null,
+    rawText ? "Использовано текстовое описание" : null,
+    hasPdfFile ? "PDF-файл отмечен как источник, реальная загрузка будет подключена позже" : null,
+  ].filter(Boolean);
 
   return Response.json({
     projectName: title || "Ориан Сиам Лофт",
@@ -37,6 +47,7 @@ export async function POST(request: Request) {
     nearbyPlaces: "Станция BTS, торговый центр The Siam, парк-музей Бенджамиты, университеты",
     investmentHighlights: "Высокий спрос, центральная локация, престижный район, потенциал роста стоимости",
     risks: "Риск задержки сдачи, конкуренция конкурирующих проектов, экономическая нестабильность",
+    sourceSummary: sourceSummaryParts.join(". "),
     fieldStatuses: {
       projectName: "found",
       developer: "review",

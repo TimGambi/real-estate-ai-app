@@ -10,26 +10,29 @@ interface SalesKitFormProps {
 export function SalesKitForm({ fileName, onSubmit, onFileChange, isAnalyzing }: SalesKitFormProps) {
   return (
     <form className="space-y-8" onSubmit={onSubmit}>
+      <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        Заполните любой доступный источник: название проекта, ссылку, описание или PDF. Чем больше материалов вы добавите, тем точнее будет результат.
+      </p>
       <div className="grid gap-6 sm:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm font-medium text-slate-700">Название объекта</span>
+          <span className="text-sm font-medium text-slate-700">Название объекта (необязательно)</span>
           <input type="text" name="title" placeholder='Например, ЖК "Парус"' className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200" />
         </label>
 
         <label className="space-y-2">
-          <span className="text-sm font-medium text-slate-700">Ссылка на объект</span>
+          <span className="text-sm font-medium text-slate-700">Ссылка на объект (необязательно)</span>
           <input type="url" name="sourceUrl" placeholder="https://example.com" className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200" />
         </label>
       </div>
 
       <label className="space-y-2">
-        <span className="text-sm font-medium text-slate-700">Описание объекта или исходные материалы</span>
+        <span className="text-sm font-medium text-slate-700">Описание объекта или исходные материалы (необязательно)</span>
         <textarea name="rawText" rows={8} placeholder="Добавьте ключевые факты, преимущества, локацию, планировки, материалы маркетинга и другие важные данные..." className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 text-slate-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200" />
       </label>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm font-medium text-slate-700">Загрузка PDF-файла</span>
+          <span className="text-sm font-medium text-slate-700">Загрузка PDF-файла (необязательно)</span>
           <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-slate-700">
             <input type="file" accept="application/pdf" onChange={onFileChange} className="w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-white file:transition file:hover:bg-slate-700" />
             {fileName ? <p className="mt-3 text-sm text-slate-600">Выбран файл: {fileName}</p> : <p className="mt-3 text-sm text-slate-500">PDF пока не загружается, это заглушка.</p>}
