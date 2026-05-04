@@ -41,11 +41,27 @@ const defaultExtractedData: ExtractedData = {
   risks: { value: "Риск задержки сдачи, конкуренция конкурирующих проектов, экономическая нестабильность", status: "not_found" },
 };
 
+interface CompositionItems {
+  pdf: boolean;
+  telegram: boolean;
+  roi: boolean;
+  faq: boolean;
+  followup: boolean;
+}
+
 export default function NewSalesKitPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isDataConfirmed, setIsDataConfirmed] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [fileName, setFileName] = useState<string>("");
   const [extractedData, setExtractedData] = useState<ExtractedData>(defaultExtractedData);
+  const [composition, setComposition] = useState<CompositionItems>({
+    pdf: true,
+    telegram: true,
+    roi: true,
+    faq: true,
+    followup: true,
+  });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -66,6 +82,17 @@ export default function NewSalesKitPage() {
 
   const handleConfirmData = () => {
     setIsDataConfirmed(true);
+  };
+
+  const handleCompositionChange = (item: keyof CompositionItems) => {
+    setComposition((prev) => ({
+      ...prev,
+      [item]: !prev[item],
+    }));
+  };
+
+  const handleGenerateSalesKit = () => {
+    setIsGenerating(true);
   };
 
   const getStatusColor = (status: StatusType) => {
@@ -334,11 +361,114 @@ export default function NewSalesKitPage() {
               </div>
             )}
 
-            {isDataConfirmed && (
+            {isDataConfirmed && !isGenerating && (
+              <div className="space-y-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-200">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-900">Настройте состав Sales Kit</h2>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Выберите, какие материалы вы хотите получить. Все компоненты включены по умолчанию.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={composition.pdf}
+                      onChange={() => handleCompositionChange("pdf")}
+                      className="mt-1 h-5 w-5 text-slate-900 accent-slate-900"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-900">PDF-презентация на 6 слайдов</p>
+                      <p className="mt-1 text-sm text-slate-600">Готовая презентация с описанием объекта, фотографиями и инвестиционными данными</p>
+                    </div>
+                  </label>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={composition.telegram}
+                      onChange={() => handleCompositionChange("telegram")}
+                      className="mt-1 h-5 w-5 text-slate-900 accent-slate-900"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-900">Telegram-пост</p>
+                      <p className="mt-1 text-sm text-slate-600">Привлекающий внимание пост для продвижения объекта в Telegram-каналах</p>
+                    </div>
+                  </label>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={composition.roi}
+                      onChange={() => handleCompositionChange("roi")}
+                      className="mt-1 h-5 w-5 text-slate-900 accent-slate-900"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-900">ROI-блок</p>
+                      <p className="mt-1 text-sm text-slate-600">Таблица потенциальной доходности инвестиций (требует проверки)</p>
+                    </div>
+                  </label>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={composition.faq}
+                      onChange={() => handleCompositionChange("faq")}
+                      className="mt-1 h-5 w-5 text-slate-900 accent-slate-900"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-900">FAQ на 7 вопросов</p>
+                      <p className="mt-1 text-sm text-slate-600">Ответы на частые вопросы о проекте, условиях покупки и инвестициях</p>
+                    </div>
+                  </label>
+
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:border-slate-300">
+                    <input
+                      type="checkbox"
+                      checked={composition.followup}
+                      onChange={() => handleCompositionChange("followup")}
+                      className="mt-1 h-5 w-5 text-slate-900 accent-slate-900"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-900">3 follow-up сообщения</p>
+                      <p className="mt-1 text-sm text-slate-600">Шаблоны для email или мессенджеров для поддержания интереса клиента</p>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-sm font-medium text-slate-900">Итоговый комплект:</p>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                    {composition.pdf && <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span>PDF-презентация</li>}
+                    {composition.telegram && <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span>Telegram-пост</li>}
+                    {composition.roi && <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span>ROI-блок</li>}
+                    {composition.faq && <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span>FAQ</li>}
+                    {composition.followup && <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span>3 follow-up сообщения</li>}
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-yellow-50 px-4 py-3">
+                  <p className="text-xs text-slate-600">
+                    <span className="font-semibold text-slate-900">Дисклеймер:</span> Цены, наличие, условия покупки и прогнозная доходность требуют проверки. ROI не является финансовой рекомендацией или гарантией доходности.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleGenerateSalesKit}
+                  className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+                >
+                  Сгенерировать Sales Kit
+                </button>
+              </div>
+            )}
+
+            {isGenerating && (
               <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
-                <p className="font-semibold text-slate-900">Следующий этап генерации</p>
+                <p className="font-semibold text-slate-900">Следующий этап: готовые материалы</p>
                 <p className="mt-2 text-sm leading-6">
-                  Следующий этап: генерация PDF-презентации, Telegram-поста, FAQ и follow-up сообщений. Следите за результатами.
+                  Следующий этап: здесь появятся готовые материалы — PDF-презентация, Telegram-пост, ROI-блок, FAQ и follow-up сообщений.
                 </p>
               </div>
             )}
