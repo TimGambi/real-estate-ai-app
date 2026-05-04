@@ -62,6 +62,96 @@ export default function NewSalesKitPage() {
     faq: true,
     followup: true,
   });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const telegramPostText = `📍 ${extractedData.projectName.value} в районе ${extractedData.location.value}
+
+🏢 Апартаменты-лофты класса А от ${extractedData.priceFrom.value} до ${extractedData.priceTo.value} THB
+
+✨ Что вас ждёт:
+• ${extractedData.infrastructure.value}
+• Площадь: ${extractedData.area.value}
+• Срок сдачи: ${extractedData.completionDate.value}
+
+🎯 Идеально для инвестиций и жизни. Высокий потенциал роста стоимости в центральном районе Бангкока.
+
+Узнайте больше о ${extractedData.projectName.value} — свяжитесь с нашей командой сегодня!`;
+
+  const roiData = [
+    {
+      scenario: "Консервативный",
+      description: "Рост цены на 3% в год",
+      initialInvestment: "2 500 000",
+      roi1Year: "75 000",
+      roi3Year: "232 500",
+      roi5Year: "397 500",
+    },
+    {
+      scenario: "Базовый",
+      description: "Рост цены на 5% в год + сдача в аренду",
+      initialInvestment: "2 500 000",
+      roi1Year: "250 000",
+      roi3Year: "900 000",
+      roi5Year: "1 650 000",
+    },
+    {
+      scenario: "Оптимистичный",
+      description: "Рост цены на 8% в год + высокая арендная доходность",
+      initialInvestment: "2 500 000",
+      roi1Year: "450 000",
+      roi3Year: "1 650 000",
+      roi5Year: "3 200 000",
+    },
+  ];
+
+  const faqData = [
+    {
+      question: "Какие условия покупки доступны для иностранцев?",
+      answer: "Фрихолд доступен для иностранцев в Таиланде без ограничений. Оплата осуществляется поэтапно: 25% при бронировании, 75% в рассрочку до сдачи.",
+    },
+    {
+      question: "Когда планируется сдача проекта?",
+      answer: `Ожидаемая сдача: ${extractedData.completionDate.value}. Точные сроки уточняйте у представителей застройщика.`,
+    },
+    {
+      question: "Возможна ли сдача в аренду?",
+      answer: "Да, разрешена сдача в аренду через туристические сервисы и коммерческую аренду. Проверьте ограничения в договоре с застройщиком.",
+    },
+    {
+      question: "Какие налоги и комиссии нужно учесть?",
+      answer: "Налог на передачу собственности (3%), налог на доход от аренды (5-10%), управление и коммунальные услуги (~5000-8000 THB/месяц).",
+    },
+    {
+      question: "Как получить визу инвестора?",
+      answer: "Инвестиции в недвижимость помогают в получении долгосрочной визы. Проконсультируйтесь с иммиграционным специалистом.",
+    },
+    {
+      question: "Какие страховки нужны?",
+      answer: "Рекомендуется страховка от финансовых рисков, страховка квартиры от повреждений и пожара, а также личное страховое покрытие.",
+    },
+    {
+      question: "Как быстро растёт спрос на недвижимость в этом районе?",
+      answer: "Район Пхаясинь показывает устойчивый рост спроса благодаря центральной локации и развитой инфраструктуре. Ежегодный рост цен варьируется от 3% до 8%.",
+    },
+  ];
+
+  const followupMessages = [
+    {
+      day: "1 день",
+      subject: "Узнали о нашем проекте?",
+      text: `Привет! 👋 Мы надеемся, что вам понравилась информация о ${extractedData.projectName.value}. У вас остались вопросы? Наша команда готова помочь с детальной консультацией. Ждём вашего звонка!`,
+    },
+    {
+      day: "3 дня",
+      subject: "Специальное предложение",
+      text: `Добрый день! Если вы заинтересованы в ${extractedData.projectName.value}, у нас есть специальное предложение на ранних сроках покупки. Заключите договор на этой неделе и получите эксклюзивные условия оплаты!`,
+    },
+    {
+      day: "7 дней",
+      subject: "Осталось мало доступных апартаментов",
+      text: `Внимание! В ${extractedData.projectName.value} осталось всего несколько апартаментов по стартовым ценам. Приняли ли вы решение? Давайте обсудим ваши варианты и забронируем идеальный объект для вас.`,
+    },
+  ];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -93,6 +183,20 @@ export default function NewSalesKitPage() {
 
   const handleGenerateSalesKit = () => {
     setIsGenerating(true);
+  };
+
+  const handleCopyToClipboard = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    alert("PDF-генерация будет подключена на следующем этапе.");
   };
 
   const getStatusColor = (status: StatusType) => {
@@ -465,11 +569,181 @@ export default function NewSalesKitPage() {
             )}
 
             {isGenerating && (
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-slate-700">
-                <p className="font-semibold text-slate-900">Следующий этап: готовые материалы</p>
-                <p className="mt-2 text-sm leading-6">
-                  Следующий этап: здесь появятся готовые материалы — PDF-презентация, Telegram-пост, ROI-блок, FAQ и follow-up сообщений.
-                </p>
+              <div className="space-y-8 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm ring-1 ring-slate-200">
+                <div>
+                  <h2 className="text-2xl font-semibold text-slate-900">Готовый Sales Kit</h2>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Все материалы готовы для использования. Скопируйте тексты, скачайте PDF или используйте напрямую.
+                  </p>
+                </div>
+
+                {composition.pdf && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-semibold text-slate-900">PDF-презентация на 6 слайдов</h3>
+                      <button
+                        onClick={handleDownloadPDF}
+                        className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+                      >
+                        Скачать PDF
+                      </button>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {[
+                        { num: 1, title: "Обложка", desc: "Название проекта, девелопер, изображение объекта" },
+                        { num: 2, title: "Общее описание", desc: "О проекте, локация, тип апартаментов, архитектура" },
+                        { num: 3, title: "Ключевая информация", desc: "Цены, площади, спальни, сроки сдачи, условия покупки" },
+                        { num: 4, title: "Локация и инфраструктура", desc: "Карта, близость к транспорту, магазины, рестораны, парки" },
+                        { num: 5, title: "Инвестиционная привлекательность", desc: "ROI-сценарии, рост стоимости, арендная доходность, преимущества" },
+                        { num: 6, title: "Условия покупки + CTA", desc: "Гибкий график платежей, визовая поддержка, контакты" },
+                      ].map((slide) => (
+                        <div key={slide.num} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="mb-2 inline-flex rounded-full bg-slate-900 px-3 py-1 text-sm font-semibold text-white">
+                            Слайд {slide.num}
+                          </div>
+                          <h4 className="mt-2 font-semibold text-slate-900">{slide.title}</h4>
+                          <p className="mt-1 text-sm text-slate-600">{slide.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {composition.telegram && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-semibold text-slate-900">Telegram-пост</h3>
+                      <button
+                        onClick={() => handleCopyToClipboard(telegramPostText, "telegram")}
+                        className={`inline-flex items-center justify-center rounded-xl px-5 py-2 text-sm font-semibold transition ${
+                          copiedId === "telegram"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                        }`}
+                      >
+                        {copiedId === "telegram" ? "✓ Скопировано" : "Скопировать"}
+                      </button>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700">
+                      {telegramPostText.split("\n").map((line, idx) => (
+                        <div key={idx}>{line}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {composition.roi && (
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-semibold text-slate-900">ROI-блок</h3>
+                    <div className="grid gap-4 md:grid-cols-3">
+                      {roiData.map((roi) => (
+                        <div key={roi.scenario} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                          <h4 className="font-semibold text-slate-900">{roi.scenario}</h4>
+                          <p className="mt-1 text-xs text-slate-600">{roi.description}</p>
+                          <div className="mt-4 space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Начальные инвестиции:</span>
+                              <span className="font-semibold text-slate-900">{roi.initialInvestment} THB</span>
+                            </div>
+                            <div className="flex justify-between border-t border-slate-200 pt-2">
+                              <span className="text-slate-600">ROI за 1 год:</span>
+                              <span className="font-semibold text-emerald-700">+{roi.roi1Year} THB</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">ROI за 3 года:</span>
+                              <span className="font-semibold text-emerald-700">+{roi.roi3Year} THB</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">ROI за 5 лет:</span>
+                              <span className="font-semibold text-emerald-700">+{roi.roi5Year} THB</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {composition.faq && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-semibold text-slate-900">FAQ на 7 вопросов</h3>
+                      <button
+                        onClick={() => handleCopyToClipboard(faqData.map((f) => `${f.question}\n${f.answer}`).join("\n\n"), "faq")}
+                        className={`inline-flex items-center justify-center rounded-xl px-5 py-2 text-sm font-semibold transition ${
+                          copiedId === "faq"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                        }`}
+                      >
+                        {copiedId === "faq" ? "✓ Скопировано" : "Скопировать FAQ"}
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {faqData.map((faq, idx) => (
+                        <details key={idx} className="group rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <summary className="flex cursor-pointer items-center justify-between font-medium text-slate-900">
+                            <span>{faq.question}</span>
+                            <span className="text-slate-400 group-open:rotate-180 transition">▼</span>
+                          </summary>
+                          <p className="mt-3 text-sm text-slate-600">{faq.answer}</p>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {composition.followup && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-semibold text-slate-900">3 Follow-up сообщения</h3>
+                      <button
+                        onClick={() => handleCopyToClipboard(followupMessages.map((m) => `[${m.day}]\n${m.subject}\n${m.text}`).join("\n\n---\n\n"), "followup")}
+                        className={`inline-flex items-center justify-center rounded-xl px-5 py-2 text-sm font-semibold transition ${
+                          copiedId === "followup"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                        }`}
+                      >
+                        {copiedId === "followup" ? "✓ Скопировано" : "Скопировать follow-up"}
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {followupMessages.map((msg, idx) => (
+                        <div key={idx} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="mb-2 flex items-center gap-2">
+                            <span className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
+                              {msg.day}
+                            </span>
+                            <span className="font-semibold text-slate-900">{msg.subject}</span>
+                          </div>
+                          <p className="text-sm text-slate-600">{msg.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="rounded-2xl border border-slate-200 bg-yellow-50 p-4">
+                  <p className="text-xs leading-6 text-slate-600">
+                    <span className="font-semibold text-slate-900">Дисклеймер:</span> Цены, наличие и условия покупки требуют подтверждения у застройщика или официального представителя. ROI является прогнозной оценкой и не является финансовой рекомендацией или гарантией доходности.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
+                  >
+                    Создать ещё один Sales Kit
+                  </button>
+                  <button
+                    onClick={() => window.location.href = "/"}
+                    className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+                  >
+                    Вернуться на главную
+                  </button>
+                </div>
               </div>
             )}
           </form>
